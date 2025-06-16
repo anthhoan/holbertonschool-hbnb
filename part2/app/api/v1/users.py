@@ -38,34 +38,3 @@ class UserResource(Resource):
         if not user:
             return {'error': 'User not found'}, 404
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
-
-class User:
-    def __init__(self, id, first_name, last_name, email, is_admin, created_at, updated_at):
-        self.id = id
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.is_admin = is_admin
-        self.created_at = created_at
-        self.updated_at = updated_at
-
-    def id(self):
-        pass
-
-    def first_name(self):
-        pass
-
-    def last_name(self):
-        pass
-
-    def email(self):
-        pass
-
-    def is_admin(self):
-        pass
-
-    def created_at(self):
-        pass
-
-    def updated(self):
-        pass
