@@ -45,9 +45,6 @@ class User:
     def email(self, value):
         if str(value)
 
-    def is_admin(self):
-        pass
-
     def save(self):
         self.updated_at = datetime.now()
 
