@@ -1,10 +1,10 @@
+#!/usr/bin/python3
+
 import uuid
 from datetime import datetime
 
 class User:
-    def __init__(self, first_name, last_name, email, is_admin):
-        if first_name is None or last_name is None or email is None:
-            raise ValueError("Required attributes not specified!")
+    def __init__(self, first_name, last_name, email, is_admin=False):
         self.id = str(uuid.uuid4())
         self.first_name = first_name
         self.last_name = last_name
@@ -19,6 +19,7 @@ class User:
 
     @first_name.setter
     def first_name(self, value):
+        value = value.strip()
         if len(self.value) < 50:
             self.first_name = value
         else:
@@ -30,6 +31,7 @@ class User:
 
     @last_name.getter
     def last_name(self, value):
+        value = value.strip()
         if len(self.value) < 50:
             self.last_name = value
         else:
