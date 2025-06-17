@@ -65,10 +65,12 @@ class User:
     # Is Admin
     @property
     def is_admin(self):
+        """Admin Getter"""
         return self._is_admin
 
     @is_admin.setter
     def is_admin(self, value):
+        """Admin Setter and return a boolean"""
         self._is_admin = bool(value)
 
     # Methods
