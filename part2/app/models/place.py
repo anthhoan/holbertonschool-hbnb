@@ -1,39 +1,40 @@
+import uuid
+from datetime import datetime
+
 class Place:
-    def __init__(self, id, title, description, price, latitude, longitude, owner, created_at, updated_at):
-        self.id = id
+    def __init__(self, title, description, price, latitude, longitude, owner):
+        if None in (title, description, price, latitude, longitude, owner):
+            raise ValueError("All attributes must be provided")
+
+        self.id = str(uuid.uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+
         self.title = title
         self.description = description
-        self.price = price
+        self._price = price
         self.latitude = latitude
         self.longitude = longitude
         self.owner = owner
-        self.created_at = created_at
-        self.updated_at = updated_at
 
-    def id(self):
-        pass
-
-    def title(self):
-        pass
-
-    def description(self):
-        pass
-
+        self.reviews = []
+        self.amenities = []
+    
+    @property
     def price(self):
-        pass
+        return self._price
+    
+    @price.setter
+    def price(self, value):
+        self._price = value
+        self.updated_at = datetime.now()
 
-    def latitude(self):
-        pass
+    def add_review(self, review):
+        self.reviews.append(review)
 
-    def longitude(self):
-        pass
+    def add_amenity(self, amenity):
+        self.amenities.append(amenity)
 
-    def owner(self):
-        pass
-
-    def created_at(self):
-        pass
-
-    def updated_at(self):
-        pass
+    def save(self):
+        self.updated_at = datetime.now() 
 
