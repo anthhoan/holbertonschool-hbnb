@@ -13,7 +13,7 @@ class User:
         self.updated_at = datetime.now()
         self.password = password
 
-#Getters and Setters
+    # First Name
     @property
     def first_name(self):
         """First name Getter"""
@@ -28,6 +28,7 @@ class User:
         else:
             raise ValueError("First name cannot exceed 50 characters.")
 
+    # Last Name
     @property
     def last_name(self):
         """Last name Getter"""
@@ -50,18 +51,27 @@ class User:
 
     @email.setter
     def email(self, value):
-        """Email Setter, raises ValueError if invalid email address, using Regex (Regular Expression) to validate email"""
+        """Email Setter, raises ValueError if invalid email address"""
         value = value.strip()
         if self._is_email_valid(value):
             self._email = value
         else:
             raise ValueError("Invalid email address.")
-        
-    def _is_email_valid(self, email):
-        """Email validation function using Regex"""
-        return re.match(r"[^@]+@[^@]+\.[^@]+", email)
 
-# Methods
+    def _is_email_valid(self, email):
+        """Email validation function using Regex to validate email"""
+        return re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email)
+
+    # Is Admin
+    @property
+    def is_admin(self):
+        return self._is_admin
+
+    @is_admin.setter
+    def is_admin(self, value):
+        self._is_admin = bool(value)
+
+    # Methods
     def save(self):
         """Function to save created_at time"""
         self.updated_at = datetime.now()
