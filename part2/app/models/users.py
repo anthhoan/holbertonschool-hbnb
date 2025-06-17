@@ -83,4 +83,3 @@ class User:
             if hasattr(self, key):
                 setattr(self, key, value)
         self.save()
-c
