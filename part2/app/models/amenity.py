@@ -1,22 +1,19 @@
+import uuid
+from datetime import datetime
+
 class Amenity:
-    def __init__(self, id, name, created_at, updated_at):
-        self.id = id
+    def __init__(self, name):
+        self.id = str(uuid.uuid4())
         self.name = name
-        self.created_at = created_at
-        self.updated_at = updated_at
-
-    def create_amenity(self, amenity_data):
-        # Placeholder for logic to create an amenity
-        pass
-
-    def get_amenity(self, amenity_id):
-        # Placeholder for logic to retrieve an amenity by ID
-        pass
-
-    def get_all_amenities(self):
-        # Placeholder for logic to retrieve all amenities
-        pass
-
-    def update_amenity(self, amenity_id, amenity_data):
-        # Placeholder for logic to update an amenity
-        pass
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+        
+    @property
+    def name(self):
+        return self._name
+        
+    @name.setter
+    def name(self, name):
+        if not isinstance(name, str):
+            raise TypeError("name must be a string")
+        self._name = name
