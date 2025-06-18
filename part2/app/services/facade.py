@@ -39,7 +39,7 @@ class HBnBFacade:
         pass
 
     def create_place(self, place_data):
-    # Placeholder for logic to create a place, including validation for price, latitude, and longitude
+        # Placeholder for logic to create a place, including validation for price, latitude, and longitude
         pass
 
     def get_place(self, place_id):
