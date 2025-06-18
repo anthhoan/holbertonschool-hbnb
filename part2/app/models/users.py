@@ -11,6 +11,8 @@ class User:
         self.is_admin = is_admin
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
+        self.places = [] # User owned places
+        self.reviews = [] # User owned reviews
 
     # First Name
     @property
@@ -20,12 +22,12 @@ class User:
 
     @first_name.setter
     def first_name(self, value):
-        """First name Setter, raises a ValueError if first name is more than 50 characters"""
+        """First name Setter, raises a ValueError if first name is more than 50 characters or less than 2 characters"""
         value = value.strip()
-        if len(value) <= 50:
+        if len(value) <= 50 or len(value) < 2:
             self._first_name = value
         else:
-            raise ValueError("First name cannot exceed 50 characters.")
+            raise ValueError("First name must be between 2-50 characters.")
 
     # Last Name
     @property
@@ -35,12 +37,12 @@ class User:
 
     @last_name.setter
     def last_name(self, value):
-        """Last name Setter, raises a ValueError if last name is more than 50 characters"""
+        """Last name Setter, raises a ValueError if last name is more than 50 characters or less than 2 characters"""
         value = value.strip()
-        if len(value) <= 50:
+        if len(value) <= 50 or len(value) < 2:
             self._last_name = value
         else:
-            raise ValueError("Last name cannot exceed 50 characters.")
+            raise ValueError("Last name must be between 2-50 characters")
 
     # Email
     @property
@@ -57,7 +59,7 @@ class User:
         else:
             raise ValueError("Invalid email address.")
 
-    def _is_email_valid(self, email):
+    def is_email_valid(self, email):
         """Email validation function using Regex to validate email"""
         return re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email)
 
