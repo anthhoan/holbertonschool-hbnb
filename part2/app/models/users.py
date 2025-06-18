@@ -59,7 +59,7 @@ class User:
         else:
             raise ValueError("Invalid email address.")
 
-    def is_email_valid(self, email):
+    def _is_email_valid(self, email):
         """Email validation function using Regex to validate email"""
         return re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email)
 
