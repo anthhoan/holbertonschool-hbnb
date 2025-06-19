@@ -83,16 +83,29 @@ class PlaceResource(Resource):
     @api.response(404, "Place not found")
     def get(self, place_id):
         """Get place details by ID"""
-        # Placeholder for the logic to retrieve a place by ID, including associated owner and amenities
-        
+        place = facade.get_place(place_id)
+        if not place:
+            return {"message": "Place not found"}, 404
+        return place, 200
 
 
-    @api.expect(place_input_model)
-    @api.response(200, 'Place updated successfully')
-    @api.response(404, 'Place not found')
-    @api.response(400, 'Invalid input data')
+@api.expect(place_input_model)
+@api.response(200, 'Place updated successfully')
+@api.response(404, 'Place not found')
+@api.response(400, 'Invalid input data')
+def put(self, place_id):
+    """Update a place's information"""
+    data = api.payload
 
-    def put(self, place_id):
-        """Update a place's information"""
-        # Placeholder for the logic to update a place by ID
-        pass
+    # Check if the place exists
+    place = facade.get_place(place_id)
+    if not place:
+        return {'message': 'Place not found'}, 404
+
+    # Update using facade
+    updated_place = facade.update_place(place_id, data)
+    return {'message': 'Place updated successfully', 'updated': updated_place.__dict__}, 200
+
+
+    
+
