@@ -57,7 +57,6 @@ class HBnBFacade:
         for field in required_fields:
             if field not in review_data:
                 raise ValueError(f"Missing required field: {field}")
-
         user = self.user_repo.get(review_data["user_id"])
         if not user:
             raise ValueError("User not found")
