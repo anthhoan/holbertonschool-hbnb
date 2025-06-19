@@ -77,5 +77,3 @@ class Place:
     def save(self):
         """Updates the updated_at timestamp"""
         self.updated_at = datetime.now()
-
-update
