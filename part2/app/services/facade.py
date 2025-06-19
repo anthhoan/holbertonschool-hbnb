@@ -23,57 +23,49 @@ class HBnBFacade:
         return self.user_repo.get_by_attribute('email', email)
 
     def create_amenity(self, amenity_data):
-        # Placeholder for logic to create an amenity
-        pass
+        amenity = Amenity(**amenity_data)
+        self.amenity_repo.add(amenity_data)
+        return amenity
 
     def get_amenity(self, amenity_id):
-        # Placeholder for logic to retrieve an amenity by ID
-        pass
+        return self.amenity_repo.get(amenity_id)
 
     def get_all_amenities(self):
-        # Placeholder for logic to retrieve all amenities
-        pass
+        return self.amenity_repo.get_all()
 
     def update_amenity(self, amenity_id, amenity_data):
-        # Placeholder for logic to update an amenity
-        pass
+        return self.amenity_repo.update(amenity_id, amenity_data)
 
     def create_place(self, place_data):
-        # Placeholder for logic to create a place, including validation for price, latitude, and longitude
-        pass
+        place = Place(**place_data)
+        self.place_repo.add(place_data)
+        return place
 
     def get_place(self, place_id):
-        # Placeholder for logic to retrieve a place by ID, including associated owner and amenities
-        pass
+        return self.place_repo.get(place_id)
 
     def get_all_places(self):
-        # Placeholder for logic to retrieve all places
-        pass
+        return self.place_repo.get_all()
 
     def update_place(self, place_id, place_data):
-        # Placeholder for logic to update a place
-        pass
+        return self.place_repo.update(place_id, place_data)
 
     def create_review(self, review_data):
-        # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
-        pass
+        review = Review(**review_data)
+        self.review_repo.add(review_data)
+        return review
 
     def get_review(self, review_id):
-        # Placeholder for logic to retrieve a review by ID
-        pass
+        return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
-        # Placeholder for logic to retrieve all reviews
-        pass
+        return self.review_repo.get_all()
 
     def get_reviews_by_place(self, place_id):
-        # Placeholder for logic to retrieve all reviews for a specific place
-        pass
+        return self.review_repo.get_by_attribute('place', place_id)
 
     def update_review(self, review_id, review_data):
-        # Placeholder for logic to update a review
-        pass
+        return self.review_repo.update(review_id, review_data)
 
     def delete_review(self, review_id):
-        # Placeholder for logic to delete a review
-        pass
+        return self.review_repo.delete(review_id)
