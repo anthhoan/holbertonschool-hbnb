@@ -1,7 +1,7 @@
 from app.api.v1.reviews import api as reviews_ns
 from app.api.v1.users import api as users_ns
 from app.api.v1.places import api as places_ns
-from app.api.v1.amenities import api as amentiy_ns
+from app.api.v1.amenities import api as amenity_ns
 from flask import Flask
 from flask_restx import Api
 
@@ -16,6 +16,6 @@ def create_app():
     api.add_namespace(reviews_ns, path="/api/v1/reviews")
     # Register the places namespace
     api.add_namespace(places_ns, path="/api/v1/places")
-    # Register the amenity namepace
-    api.add_namespace(amentiy_ns, path="/api/v1/amenities")
+    # Register the amenity namespace
+    api.add_namespace(amenity_ns, path="/api/v1/amenities")
     return app
