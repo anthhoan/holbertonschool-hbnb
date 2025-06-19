@@ -96,6 +96,3 @@ class PlaceResource(Resource):
         """Update a place's information"""
         # Placeholder for the logic to update a place by ID
         pass
-
-
-    this is a test
