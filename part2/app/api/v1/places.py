@@ -62,11 +62,11 @@ class PlaceList(Resource):
         data = api.payload
 
         if not data.get('title') or not data.get('price') or not data.get('latitude') or not data.get('longitude') or not data.get('owner_id'):
-            return {'message': 'Missing required fields'}, 400
+            return {'Error': 'Missing required fields'}, 400
         new_place = Place(**data)
         facade.place_repo.add(new_place)
 
-        return {'message': 'Place successfully created'}, 201
+        return {'Success': 'Place successfully created'}, 201
     
     @api.marshal_list_with(place_output_model)
     @api.response(200, 'List of places retrieved successfully')
@@ -85,7 +85,7 @@ class PlaceResource(Resource):
         """Get place details by ID"""
         place = facade.get_place(place_id)
         if not place:
-            return {"message": "Place not found"}, 404
+            return {"Error": "Place not found"}, 404
         return place, 200
 
 
@@ -100,12 +100,8 @@ def put(self, place_id):
     # Check if the place exists
     place = facade.get_place(place_id)
     if not place:
-        return {'message': 'Place not found'}, 404
+        return {'Error': 'Place not found'}, 404
 
     # Update using facade
     updated_place = facade.update_place(place_id, data)
-    return {'message': 'Place updated successfully', 'updated': updated_place.__dict__}, 200
-
-
-    
-
+    return {'Success': 'Place updated successfully', 'Updated': updated_place.__dict__}, 200
