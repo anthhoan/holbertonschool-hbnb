@@ -23,3 +23,16 @@ class Amenity:
         if not isinstance(name, str):
             raise TypeError("name must be a string")
         self._name = name
+
+    # Save
+    def save(self):
+        """Function to save created_at time"""
+        self.updated_at = datetime.now()
+
+    # Update
+    def update(self, data):
+        """Function to save updated_at time"""
+        for key, value in data.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        self.save()

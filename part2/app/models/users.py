@@ -74,11 +74,12 @@ class User:
         """Admin Setter and return a boolean"""
         self._is_admin = bool(value)
 
-    # Methods
+    # Save
     def save(self):
         """Function to save created_at time"""
         self.updated_at = datetime.now()
 
+    # Update
     def update(self, data):
         """Function to save updated_at time"""
         for key, value in data.items():
