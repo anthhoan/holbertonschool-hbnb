@@ -14,7 +14,9 @@ class User:
         self.places = [] # User owned places
         self.reviews = [] # User owned reviews
 
-    # First Name
+    """
+    FIRST NAME
+    """
     @property
     def first_name(self):
         """First name Getter"""
@@ -29,7 +31,9 @@ class User:
         else:
             raise ValueError("First name must be between 2-50 characters.")
 
-    # Last Name
+    """
+    LAST NAME
+    """
     @property
     def last_name(self):
         """Last name Getter"""
@@ -44,7 +48,9 @@ class User:
         else:
             raise ValueError("Last name must be between 2-50 characters")
 
-    # Email
+    """
+    EMAIL
+    """
     @property
     def email(self):
         """Email Getter"""
@@ -63,7 +69,9 @@ class User:
         """Email validation function using Regex to validate email"""
         return re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email)
 
-    # Is Admin
+    """
+    IS ADMIN
+    """
     @property
     def is_admin(self):
         """Admin Getter"""
@@ -74,12 +82,16 @@ class User:
         """Admin Setter and return a boolean"""
         self._is_admin = bool(value)
 
-    # Save
+    """
+    SAVE
+    """
     def save(self):
         """Function to save created_at time"""
         self.updated_at = datetime.now()
 
-    # Update
+    """
+    UPDATE
+    """
     def update(self, data):
         """Function to save updated_at time"""
         for key, value in data.items():

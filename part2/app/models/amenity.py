@@ -8,7 +8,9 @@ class Amenity:
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
 
-    # Amenity name
+    """
+    NAME
+    """
     @property
     def name(self):
         return self._name
@@ -24,12 +26,16 @@ class Amenity:
             raise TypeError("name must be a string")
         self._name = name
 
-    # Save
+    """
+    SAVE
+    """
     def save(self):
         """Function to save created_at time"""
         self.updated_at = datetime.now()
 
-    # Update
+    """
+    UPDATE
+    """
     def update(self, data):
         """Function to save updated_at time"""
         for key, value in data.items():

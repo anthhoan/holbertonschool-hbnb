@@ -28,6 +28,9 @@ class Review:
         user.reviews.append(self)
         place.reviews.append(self)
 
+    """
+    RATING
+    """
     @property
     def rating(self):
         return self._rating
@@ -39,9 +42,15 @@ class Review:
         self._rating = value
         self.updated_at = datetime.now()
 
+    """
+    SAVE
+    """
     def save(self):
         self.updated_at = datetime.now()
 
+    """
+    UPDATE
+    """
     def update(self, data):
         for key, value in data.items():
             if hasattr(self, key):
