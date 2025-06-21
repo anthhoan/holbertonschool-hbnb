@@ -60,6 +60,22 @@ place_output_model = api.inherit(
 )
 
 
+def place_to_dict(place):
+    """Convert Place object to a dictionary for JSON serialization"""
+    return {
+        "id": place.id,
+        "title": place.title,
+        "description": place.description,
+        "price": place.price,
+        "latitude": place.latitude,
+        "longitude": place.longitude,
+        "owner_id": place.owner_id,
+        "amenities": place.amenities,
+        "created_at": place.created_at.isoformat(),
+        "updated_at": place.updated_at.isoformat(),
+    }
+
+
 @api.route("/")
 class PlaceList(Resource):
     @api.expect(place_input_model)
@@ -78,17 +94,19 @@ class PlaceList(Resource):
             or not data.get("owner_id")
         ):
             return {"Error": "Missing required fields"}, 400
-        new_place = Place(**data)
-        facade.place_repo.add(new_place)
 
-        return {"Success": "Place successfully created"}, 201
+        try:
+            new_place = Place(**data)
+            facade.place_repo.add(new_place)
+            return place_to_dict(new_place), 201
+        except ValueError as e:
+            return {"Error": str(e)}, 400
 
-    @api.marshal_list_with(place_output_model)
     @api.response(200, "List of places retrieved successfully")
     def get(self):
         """Retrieve a list of all places"""
-        # Placeholder for logic to return a list of all places
-        return facade.place_repo.get_all()
+        places = facade.place_repo.get_all()
+        return [place_to_dict(place) for place in places], 200
 
 
 @api.route("/<place_id>")
@@ -100,25 +118,24 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             return {"Error": "Place not found"}, 404
-        return place, 200
+        return place_to_dict(place), 200
 
+    @api.expect(place_input_model)
+    @api.response(200, "Place updated successfully")
+    @api.response(404, "Place not found")
+    @api.response(400, "Invalid input data")
+    def put(self, place_id):
+        """Update a place's information"""
+        data = api.payload
 
-@api.expect(place_input_model)
-@api.response(200, "Place updated successfully")
-@api.response(404, "Place not found")
-@api.response(400, "Invalid input data")
-def put(self, place_id):
-    """Update a place's information"""
-    data = api.payload
+        # Check if the place exists
+        place = facade.get_place(place_id)
+        if not place:
+            return {"Error": "Place not found"}, 404
 
-    # Check if the place exists
-    place = facade.get_place(place_id)
-    if not place:
-        return {"Error": "Place not found"}, 404
-
-    # Update using facade
-    updated_place = facade.update_place(place_id, data)
-    return {
-        "Success": "Place updated successfully",
-        "Updated": updated_place.__dict__,
-    }, 200
+        # Update using facade
+        try:
+            updated_place = facade.update_place(place_id, data)
+            return {"Success": "Place updated successfully"}, 200
+        except ValueError as e:
+            return {"Error": str(e)}, 400
