@@ -1,7 +1,6 @@
-from app.services import facade
 from app.models.place import Place
+from app.services import facade
 from flask_restx import Namespace, Resource, fields
-
 
 api = Namespace("places", description="Place operations")
 
@@ -36,41 +35,56 @@ review_model = api.model(
 )
 
 # Define the place model for input validation and documentation
-place_input_model = api.model('Place', {
-    'title': fields.String(required=True, description='Title of the place'),
-    'description': fields.String(description='Description of the place'),
-    'price': fields.Float(required=True, description='Price per night'),
-    'latitude': fields.Float(required=True, description='Latitude of the place'),
-    'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
-})
+place_input_model = api.model(
+    "Place",
+    {
+        "title": fields.String(required=True, description="Title of the place"),
+        "description": fields.String(description="Description of the place"),
+        "price": fields.Float(required=True, description="Price per night"),
+        "latitude": fields.Float(required=True, description="Latitude of the place"),
+        "longitude": fields.Float(required=True, description="Longitude of the place"),
+        "owner_id": fields.String(required=True, description="ID of the owner"),
+        "amenities": fields.List(
+            fields.String, required=True, description="List of amenities ID's"
+        ),
+        "reviews": fields.List(
+            fields.Nested(review_model), description="List of reviews"
+        ),
+    },
+)
 
-place_output_model = api.inherit('PlaceOutput', place_input_model, {
-    'id': fields.String(description='ID of the place')
-})
+place_output_model = api.inherit(
+    "PlaceOutput",
+    place_input_model,
+    {"id": fields.String(description="ID of the place")},
+)
 
-@api.route('/')
+
+@api.route("/")
 class PlaceList(Resource):
     @api.expect(place_input_model)
-    @api.response(201, 'Place successfully created')
-    @api.response(400, 'Invalid input data')
-
+    @api.response(201, "Place successfully created")
+    @api.response(400, "Invalid input data")
     def post(self):
         """Register a new place"""
         # Placeholder for the logic to register a new place
         data = api.payload
 
-        if not data.get('title') or not data.get('price') or not data.get('latitude') or not data.get('longitude') or not data.get('owner_id'):
-            return {'Error': 'Missing required fields'}, 400
+        if (
+            not data.get("title")
+            or not data.get("price")
+            or not data.get("latitude")
+            or not data.get("longitude")
+            or not data.get("owner_id")
+        ):
+            return {"Error": "Missing required fields"}, 400
         new_place = Place(**data)
         facade.place_repo.add(new_place)
 
-        return {'Success': 'Place successfully created'}, 201
-    
-    @api.marshal_list_with(place_output_model)
-    @api.response(200, 'List of places retrieved successfully')
+        return {"Success": "Place successfully created"}, 201
 
+    @api.marshal_list_with(place_output_model)
+    @api.response(200, "List of places retrieved successfully")
     def get(self):
         """Retrieve a list of all places"""
         # Placeholder for logic to return a list of all places
@@ -90,9 +104,9 @@ class PlaceResource(Resource):
 
 
 @api.expect(place_input_model)
-@api.response(200, 'Place updated successfully')
-@api.response(404, 'Place not found')
-@api.response(400, 'Invalid input data')
+@api.response(200, "Place updated successfully")
+@api.response(404, "Place not found")
+@api.response(400, "Invalid input data")
 def put(self, place_id):
     """Update a place's information"""
     data = api.payload
@@ -100,8 +114,11 @@ def put(self, place_id):
     # Check if the place exists
     place = facade.get_place(place_id)
     if not place:
-        return {'Error': 'Place not found'}, 404
+        return {"Error": "Place not found"}, 404
 
     # Update using facade
     updated_place = facade.update_place(place_id, data)
-    return {'Success': 'Place updated successfully', 'Updated': updated_place.__dict__}, 200
+    return {
+        "Success": "Place updated successfully",
+        "Updated": updated_place.__dict__,
+    }, 200
