@@ -17,14 +17,13 @@ class Amenity:
 
     @name.setter
     def name(self, name):
-        value = value.strip()
-        if len(value) <= 50:
-            self._name = value
-        else:
-            raise ValueError("Amenity name cannot exceed 50 characters")
         if not isinstance(name, str):
             raise TypeError("name must be a string")
-        self._name = name
+        value = name.strip()
+        if len(value) > 50:
+            raise ValueError("Amenity name cannot exceed 50 characters")
+        self._name = value
+
 
     """
     SAVE
