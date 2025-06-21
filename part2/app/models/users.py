@@ -1,6 +1,7 @@
+import re
 import uuid
 from datetime import datetime
-import re
+
 
 class User:
     def __init__(self, first_name, last_name, email, is_admin=False):
@@ -11,12 +12,13 @@ class User:
         self.is_admin = is_admin
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
-        self.places = [] # User owned places
-        self.reviews = [] # User owned reviews
+        self.places = []  # User owned places
+        self.reviews = []  # User owned reviews
 
     """
     FIRST NAME
     """
+
     @property
     def first_name(self):
         """First name Getter"""
@@ -26,7 +28,9 @@ class User:
     def first_name(self, value):
         """First name Setter, raises a ValueError if first name is more than 50 characters or less than 2 characters"""
         value = value.strip()
-        if len(value) <= 50 or len(value) < 2:
+        if not value:
+            raise ValueError("First name cannot be empty.")
+        if len(value) <= 50 and len(value) >= 2:
             self._first_name = value
         else:
             raise ValueError("First name must be between 2-50 characters.")
@@ -34,6 +38,7 @@ class User:
     """
     LAST NAME
     """
+
     @property
     def last_name(self):
         """Last name Getter"""
@@ -43,7 +48,9 @@ class User:
     def last_name(self, value):
         """Last name Setter, raises a ValueError if last name is more than 50 characters or less than 2 characters"""
         value = value.strip()
-        if len(value) <= 50 or len(value) < 2:
+        if not value:
+            raise ValueError("Last name cannot be empty.")
+        if len(value) <= 50 and len(value) >= 2:
             self._last_name = value
         else:
             raise ValueError("Last name must be between 2-50 characters")
@@ -51,6 +58,7 @@ class User:
     """
     EMAIL
     """
+
     @property
     def email(self):
         """Email Getter"""
@@ -67,11 +75,12 @@ class User:
 
     def _is_email_valid(self, email):
         """Email validation function using Regex to validate email"""
-        return re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email)
+        return re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email)
 
     """
     IS ADMIN
     """
+
     @property
     def is_admin(self):
         """Admin Getter"""
@@ -85,6 +94,7 @@ class User:
     """
     SAVE
     """
+
     def save(self):
         """Function to save created_at time"""
         self.updated_at = datetime.now()
@@ -92,6 +102,7 @@ class User:
     """
     UPDATE
     """
+
     def update(self, data):
         """Function to save updated_at time"""
         for key, value in data.items():
