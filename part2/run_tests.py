@@ -13,10 +13,10 @@ def run_tests():
     test_suite = unittest.TestSuite()
 
     # Add test cases
-    test_suite.addTest(unittest.makeSuite(TestUserEndpoints))
-    test_suite.addTest(unittest.makeSuite(TestPlaceEndpoints))
-    test_suite.addTest(unittest.makeSuite(TestReviewEndpoints))
-    test_suite.addTest(unittest.makeSuite(TestAmenityEndpoints))
+    test_suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(TestUserEndpoints))
+    test_suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(TestPlaceEndpoints))
+    test_suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(TestReviewEndpoints))
+    test_suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(TestAmenityEndpoints))
 
     # Run the tests
     runner = unittest.TextTestRunner(verbosity=2)
