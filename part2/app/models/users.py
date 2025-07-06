@@ -1,6 +1,9 @@
 import re
 import uuid
 from datetime import datetime
+from flask_bcrypt import Bcrypt
+
+bcrypt = Bcrypt()
 
 
 class User:
@@ -109,3 +112,19 @@ class User:
             if hasattr(self, key):
                 setattr(self, key, value)
         self.save()
+    
+    def set_password(self, password):
+        """Hash and store the password securely"""
+        self._password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def check_password(self, password):
+        """Verify a stored password against one provided by user"""
+        return bcrypt.check_password_hash(self._password_hash, password)
+
+    @property
+    def password(self):
+        raise AttributeError("Password is write-only.")
+
+    @password.setter
+    def password(self, value):
+        self.set_password(value)
