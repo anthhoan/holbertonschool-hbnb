@@ -1,16 +1,33 @@
 import uuid
+from app import db, bcrypt
 from datetime import datetime
 import re
+from baseclass import BaseModel
 
-class User:
+class User(BaseModel):
+    __tablename__ = 'users'
+
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+
+    def hash_password(self, password):
+        """Hash the password before storing it."""
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def verify_password(self, password):
+        """Verify the hashed password."""
+        return bcrypt.check_password_hash(self.password, password)
+    
     def __init__(self, first_name, last_name, email, is_admin=False):
-        self.id = str(uuid.uuid4())
+        super().__init__()
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.is_admin = is_admin
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
         self.places = [] # User owned places
         self.reviews = [] # User owned reviews
 
