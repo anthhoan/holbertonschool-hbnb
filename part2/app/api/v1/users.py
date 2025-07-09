@@ -34,7 +34,7 @@ class UserList(Resource):
 
         try:
             new_user = facade.create_user(user_data)
-            user.password = user_data["password"]
+            new_user.password = user_data["password"]
             return {
                 "id": new_user.id,
                 "first_name": new_user.first_name,
