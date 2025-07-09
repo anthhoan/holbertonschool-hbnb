@@ -1,8 +1,19 @@
 import uuid
 from datetime import datetime
-from app.models.users import User  # Assuming the User class is here
+from app.models.users import User
+from baseclass import BaseModel
+from sqlalchemy import Column, Integer, String, Float
+from app import db
 
-class Place():
+class Place(BaseModel):
+    __tablename__ = 'places'
+    place_title = db.Column(db.String(100), nullable=False, unique=True)
+    place_description = db.Column(db.String(1000), nullable=False)
+    place_price = db.Column(db.Float(99999.99), nullable=False)
+    place_latitude = db.Column(db.Float(90), nullable=False)
+    place_longitude = db.Column(db.Float(180), nullable=False)
+
+
     def __init__(self, title, description, price, latitude, longitude, owner_id, amenities=None):
         self.id = str(uuid.uuid4())
         self.title = title
