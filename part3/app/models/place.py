@@ -2,9 +2,17 @@ import uuid
 from datetime import datetime
 from app.models.users import User
 from baseclass import BaseModel
-from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from app import db
+from flask_bcrypt import Bcrypt
+
+bcrypt = Bcrypt()
+
+place_amenity = Table('place_amenity', Base.metadata,
+    Column('place_id', String(60), ForeignKey('places.id'), primary_key=True),
+    Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True)
+)
 
 class Place(BaseModel):
     __tablename__ = 'places'
