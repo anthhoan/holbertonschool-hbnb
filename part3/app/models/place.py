@@ -2,16 +2,20 @@ import uuid
 from datetime import datetime
 from app.models.users import User
 from baseclass import BaseModel
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey
+from sqlalchemy.orm import relationship
 from app import db
 
 class Place(BaseModel):
     __tablename__ = 'places'
-    place_title = db.Column(db.String(100), nullable=False, unique=True)
-    place_description = db.Column(db.String(1000), nullable=False)
-    place_price = db.Column(db.Float(99999.99), nullable=False)
-    place_latitude = db.Column(db.Float(90), nullable=False)
-    place_longitude = db.Column(db.Float(180), nullable=False)
+    _title = db.Column(db.String(100), nullable=False, unique=True)
+    _description = db.Column(db.Text(), nullable=False)
+    _price = db.Column(db.Float(), nullable=False)
+    _latitude = db.Column(db.Float(), nullable=False)
+    _longitude = db.Column(db.Float(), nullable=False)
+    _owner_id = Column("owner_id", String(60), ForeignKey('users.id'), nullable=False)
+    owner_r = relationship("User", back_populates="places_r")
+    reviews_r = relationship("Review", back_populates="place_r")
 
 
     def __init__(self, title, description, price, latitude, longitude, owner_id, amenities=None):
