@@ -1,3 +1,5 @@
-from app.services.facade import facade
+from app.services.facade import HBnBFacade
+
+facade = HBnBFacade()
 
 __all__ = ['facade']
