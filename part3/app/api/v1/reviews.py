@@ -23,8 +23,8 @@ def review_to_dict(review):
         "id": review.id,
         "text": review.text,
         "rating": review.rating,
-        "user_id": review.user.id,
-        "place_id": review.place.id,
+        "user_id": review.user_r.id,
+        "place_id": review.place_r.id,
     }
 
 
