@@ -31,6 +31,17 @@ class HBnBFacade:
     def get_user_by_email(self, email):
         return self.user_repo.get_user_by_email(email)
 
+    def update_user(self, user_id, user_data):
+        """Update a user and return the updated user"""
+        user = self.user_repo.get(user_id)
+        if not user:
+            return None
+        # Only allow updating certain fields (not email or password for security)
+        allowed_fields = ["first_name", "last_name"]
+        update_data = {k: v for k, v in user_data.items() if k in allowed_fields}
+        user.update(update_data)
+        return user
+
     def delete_user(self, user_id):
         """Delete a user and return True if successful"""
         user = self.user_repo.get(user_id)
