@@ -57,6 +57,8 @@ class SQLAlchemyRepository(Repository):
         if obj:
             db.session.delete(obj)
             db.session.commit()
+            return True
+        return False
 
     def get_by_attribute(self, attr_name, attr_value):
         return self.model.query.filter_by(**{attr_name: attr_value}).first()

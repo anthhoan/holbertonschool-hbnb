@@ -133,13 +133,5 @@ class HBnBFacade:
         return review
 
     def delete_review(self, review_id):
-        review = self.review_repo.get(review_id)
-        if not review:
-            return False
-        # Remove from user and place reviews lists (SQLAlchemy relationships)
-        if review in review.user_r.reviews_r:
-            review.user_r.reviews_r.remove(review)
-        if review in review.place_r.reviews_r:
-            review.place_r.reviews_r.remove(review)
-        self.review_repo.delete(review_id)
-        return True
+        # SQLAlchemy will handle relationship cleanup automatically
+        return self.review_repo.delete(review_id)
