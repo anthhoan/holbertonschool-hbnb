@@ -39,8 +39,25 @@ class ReviewList(Resource):
         try:
             review = facade.create_review(data)
             return review_to_dict(review), 201
+        except ValueError as e:
+            # Handle validation errors from facade (user not found, place not found, etc.)
+            return {"error": str(e)}, 400
         except Exception as e:
-            return {"Error": str(e)}, 400
+            # Handle database constraint errors and other exceptions
+            error_msg = str(e)
+            if 'UNIQUE constraint failed: reviews.user_id, reviews.place_id' in error_msg:
+                return {
+                    "error": "You have already reviewed this place. Each user can only review a place once."
+                }, 409  # 409 Conflict is more appropriate than 400 for duplicate resources
+            elif 'FOREIGN KEY constraint failed' in error_msg:
+                return {
+                    "error": "Invalid user_id or place_id provided."
+                }, 400
+            else:
+                # For any other unexpected errors, don't expose internal details
+                return {
+                    "error": "An error occurred while creating the review. Please try again."
+                }, 500
 
     @api.response(200, "List of reviews retrieved successfully")
     def get(self):
@@ -67,10 +84,15 @@ class ReviewResource(Resource):
     def put(self, review_id):
         """Update a review's information"""
         data = request.json
-        review = facade.update_review(review_id, data)
-        if review is None:
-            return {"Error": "Review not found"}, 404
-        return {"Success": "Review updated successfully"}, 200
+        try:
+            review = facade.update_review(review_id, data)
+            if review is None:
+                return {"error": "Review not found"}, 404
+            return {"message": "Review updated successfully"}, 200
+        except ValueError as e:
+            return {"error": str(e)}, 400
+        except Exception:
+            return {"error": "An error occurred while updating the review"}, 500
 
     @api.response(200, "Review deleted successfully")
     @api.response(404, "Review not found")
