@@ -2,8 +2,8 @@ from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.review import Review
 from app.models.users import User
-from app.persistence.repository import SQLAlchemyRepository
 from app.persistence.UserRepository import UserRepository
+from app.persistence.repository import SQLAlchemyRepository
 
 
 class HBnBFacade:
@@ -17,8 +17,11 @@ class HBnBFacade:
     USER
     """
     def create_user(self, user_data):
+        # Extract password and create user without it
+        password = user_data.pop('password')
         user = User(**user_data)
-        user.hash_password(user_data['password'])
+        # Hash the password after creating the user
+        user.hash_password(password)
         self.user_repo.add(user)
         return user
 
@@ -27,7 +30,6 @@ class HBnBFacade:
 
     def get_user_by_email(self, email):
         return self.user_repo.get_user_by_email(email)
-
 
     """
     AMENITY

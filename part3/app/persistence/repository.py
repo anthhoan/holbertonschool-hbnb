@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from app import db
 
 
 class Repository(ABC):
@@ -29,7 +30,6 @@ class Repository(ABC):
 """
 SQLAlchemy Repository
 """
-from app import db
 
 class SQLAlchemyRepository(Repository):
     def __init__(self, model):
