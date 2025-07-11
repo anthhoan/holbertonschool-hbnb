@@ -11,6 +11,12 @@ user_model = api.model('User', {
     'password': fields.String(required=True, description='Password of the user')
 })
 
+# Define the user update model (only first_name and last_name can be updated)
+user_update_model = api.model('UserUpdate', {
+    'first_name': fields.String(required=False, description='First name of the user'),
+    'last_name': fields.String(required=False, description='Last name of the user')
+})
+
 @api.route('/')
 class UserList(Resource):
     @api.expect(user_model, validate=True)
@@ -62,3 +68,41 @@ class UserResource(Resource):
             'last_name': user.last_name,
             'email': user.email
         }, 200
+
+    @api.expect(user_update_model)
+    @api.response(200, 'User updated successfully')
+    @api.response(404, 'User not found')
+    @api.response(400, 'Invalid input data')
+    def put(self, user_id):
+        """Update a user's information"""
+        user_data = api.payload
+
+        try:
+            updated_user = facade.update_user(user_id, user_data)
+            if not updated_user:
+                return {'error': 'User not found'}, 404
+            return {
+                'message': 'User updated successfully',
+                'user': {
+                    'id': updated_user.id,
+                    'first_name': updated_user.first_name,
+                    'last_name': updated_user.last_name,
+                    'email': updated_user.email
+                }
+            }, 200
+        except ValueError as e:
+            return {'error': str(e)}, 400
+        except Exception:
+            return {'error': 'An error occurred while updating the user'}, 500
+
+    @api.response(200, 'User deleted successfully')
+    @api.response(404, 'User not found')
+    def delete(self, user_id):
+        """Delete a user"""
+        try:
+            success = facade.delete_user(user_id)
+            if not success:
+                return {'error': 'User not found'}, 404
+            return {'message': 'User deleted successfully'}, 200
+        except Exception:
+            return {'error': 'An error occurred while deleting the user'}, 500
