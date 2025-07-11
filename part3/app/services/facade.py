@@ -31,6 +31,14 @@ class HBnBFacade:
     def get_user_by_email(self, email):
         return self.user_repo.get_user_by_email(email)
 
+    def delete_user(self, user_id):
+        """Delete a user and return True if successful"""
+        user = self.user_repo.get(user_id)
+        if not user:
+            return False
+        self.user_repo.delete(user_id)
+        return True
+
     """
     AMENITY
     """
@@ -84,8 +92,10 @@ class HBnBFacade:
             raise ValueError("Place not found")
         text = review_data["text"]
         rating = review_data["rating"]
+        place_id = review_data["place_id"]
+        user_id = review_data["user_id"]
         # Review class will validate text and rating
-        review = Review(text=text, rating=rating, place=place, user=user)
+        review = Review(text=text, rating=rating, place_id=place_id, user_id=user_id)
         self.review_repo.add(review)
         return review
 
@@ -99,7 +109,7 @@ class HBnBFacade:
         place = self.place_repo.get(place_id)
         if not place:
             return None
-        return place.reviews
+        return place.reviews_r
 
     def update_review(self, review_id, review_data):
         review = self.review_repo.get(review_id)
@@ -115,10 +125,10 @@ class HBnBFacade:
         review = self.review_repo.get(review_id)
         if not review:
             return False
-        # Remove from user and place reviews lists
-        if review in review.user.reviews:
-            review.user.reviews.remove(review)
-        if review in review.place.reviews:
-            review.place.reviews.remove(review)
+        # Remove from user and place reviews lists (SQLAlchemy relationships)
+        if review in review.user_r.reviews_r:
+            review.user_r.reviews_r.remove(review)
+        if review in review.place_r.reviews_r:
+            review.place_r.reviews_r.remove(review)
         self.review_repo.delete(review_id)
         return True

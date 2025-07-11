@@ -15,8 +15,8 @@ class User(BaseModel):
     _is_admin = db.Column('is_admin', db.Boolean, default=False)
 
     # Relationships
-    places_r = relationship("Place", back_populates="owner_r")
-    reviews_r = relationship("Review", back_populates="user_r")
+    places_r = relationship("Place", back_populates="owner_r", cascade="all, delete-orphan")
+    reviews_r = relationship("Review", back_populates="user_r", cascade="all, delete-orphan")
 
     def hash_password(self, password):
         """Hash the password before storing it."""
