@@ -2,8 +2,8 @@ from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.review import Review
 from app.models.users import User
-from app.persistence.repository import SQLAlchemyRepository
 from app.persistence.UserRepository import UserRepository
+from app.persistence.repository import SQLAlchemyRepository
 
 
 class HBnBFacade:
@@ -17,8 +17,11 @@ class HBnBFacade:
     USER
     """
     def create_user(self, user_data):
+        # Extract password and create user without it
+        password = user_data.pop('password')
         user = User(**user_data)
-        user.hash_password(user_data['password'])
+        # Hash the password after creating the user
+        user.hash_password(password)
         self.user_repo.add(user)
         return user
 
@@ -28,6 +31,24 @@ class HBnBFacade:
     def get_user_by_email(self, email):
         return self.user_repo.get_user_by_email(email)
 
+    def update_user(self, user_id, user_data):
+        """Update a user and return the updated user"""
+        user = self.user_repo.get(user_id)
+        if not user:
+            return None
+        # Only allow updating certain fields (not email or password for security)
+        allowed_fields = ["first_name", "last_name"]
+        update_data = {k: v for k, v in user_data.items() if k in allowed_fields}
+        user.update(update_data)
+        return user
+
+    def delete_user(self, user_id):
+        """Delete a user and return True if successful"""
+        user = self.user_repo.get(user_id)
+        if not user:
+            return False
+        self.user_repo.delete(user_id)
+        return True
 
     """
     AMENITY
@@ -82,8 +103,10 @@ class HBnBFacade:
             raise ValueError("Place not found")
         text = review_data["text"]
         rating = review_data["rating"]
+        place_id = review_data["place_id"]
+        user_id = review_data["user_id"]
         # Review class will validate text and rating
-        review = Review(text=text, rating=rating, place=place, user=user)
+        review = Review(text=text, rating=rating, place_id=place_id, user_id=user_id)
         self.review_repo.add(review)
         return review
 
@@ -97,7 +120,7 @@ class HBnBFacade:
         place = self.place_repo.get(place_id)
         if not place:
             return None
-        return place.reviews
+        return place.reviews_r
 
     def update_review(self, review_id, review_data):
         review = self.review_repo.get(review_id)
@@ -110,13 +133,5 @@ class HBnBFacade:
         return review
 
     def delete_review(self, review_id):
-        review = self.review_repo.get(review_id)
-        if not review:
-            return False
-        # Remove from user and place reviews lists
-        if review in review.user.reviews:
-            review.user.reviews.remove(review)
-        if review in review.place.reviews:
-            review.place.reviews.remove(review)
-        self.review_repo.delete(review_id)
-        return True
+        # SQLAlchemy will handle relationship cleanup automatically
+        return self.review_repo.delete(review_id)

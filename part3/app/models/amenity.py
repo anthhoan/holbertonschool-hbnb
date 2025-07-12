@@ -1,27 +1,21 @@
-from app.persistence import Base
-from sqlalchemy import Column, String, DateTime
-from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
-from app.models.place import place_amenity
+from app.models.baseclass import BaseModel
+from sqlalchemy.orm import relationship
+from app import db
 
-class Amenity(Base):
+class Amenity(BaseModel):
     """Amenity model"""
     __tablename__ = 'amenities'
 
-    id = Column(String(60), primary_key=True, default=lambda: str(uuid.uuid4()))
-    created_at = Column(DateTime, nullable=False, default=datetime.now())
-    updated_at = Column(DateTime, nullable=False, default=datetime.now())
-    _name = Column("name", String(50), nullable=False)
-    places = relationship("Place", secondary=place_amenity, back_populates="amenities")
+    _name = db.Column('name', db.String(50), nullable=False)
 
+    # Relationship to Place (many-to-many)
+    places_r = relationship("Place", secondary="place_amenity", back_populates="amenities_r")
 
-class Amenity:
     def __init__(self, name):
-        self.id = str(uuid.uuid4())
+        super().__init__()
         self.name = name
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
 
     """
     NAME
@@ -31,15 +25,15 @@ class Amenity:
         return self._name
 
     @name.setter
-    def name(self, name):
-        value = value.strip()
-        if len(value) <= 50:
-            self._name = value
-        else:
-            raise ValueError("Amenity name cannot exceed 50 characters")
-        if not isinstance(name, str):
+    def name(self, value):
+        if not isinstance(value, str):
             raise TypeError("name must be a string")
-        self._name = name
+        value = value.strip()
+        if not value:
+            raise ValueError("Amenity name cannot be empty")
+        if len(value) > 50:
+            raise ValueError("Amenity name cannot exceed 50 characters")
+        self._name = value
 
     """
     SAVE

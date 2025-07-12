@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from app import db
 
 
 class Repository(ABC):
@@ -29,7 +30,6 @@ class Repository(ABC):
 """
 SQLAlchemy Repository
 """
-from app import db
 
 class SQLAlchemyRepository(Repository):
     def __init__(self, model):
@@ -57,6 +57,8 @@ class SQLAlchemyRepository(Repository):
         if obj:
             db.session.delete(obj)
             db.session.commit()
+            return True
+        return False
 
     def get_by_attribute(self, attr_name, attr_value):
         return self.model.query.filter_by(**{attr_name: attr_value}).first()

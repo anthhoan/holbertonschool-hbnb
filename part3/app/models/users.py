@@ -1,39 +1,37 @@
 import uuid
-from app import db, bcrypt
 from datetime import datetime
 import re
 from app.models.baseclass import BaseModel
 from sqlalchemy.orm import relationship
+from app import bcrypt, db
 
 class User(BaseModel):
     __tablename__ = 'users'
 
-    _first_name = db.Column(db.String(50), nullable=False)
-    _last_name = db.Column(db.String(50), nullable=False)
-    _email = db.Column(db.String(120), nullable=False, unique=True)
-    _password = db.Column(db.String(128), nullable=False)
-    _is_admin = db.Column(db.Boolean, default=False)
+    _first_name = db.Column('first_name', db.String(50), nullable=False)
+    _last_name = db.Column('last_name', db.String(50), nullable=False)
+    _email = db.Column('email', db.String(120), nullable=False, unique=True)
+    _password = db.Column('password', db.String(128), nullable=False)
+    _is_admin = db.Column('is_admin', db.Boolean, default=False)
 
-    places_r = relationship("Place", back_populates="owner_r")
-    reviews_r = relationship("Review", back_populates="user_r")
+    # Relationships
+    places_r = relationship("Place", back_populates="owner_r", cascade="all, delete-orphan")
+    reviews_r = relationship("Review", back_populates="user_r", cascade="all, delete-orphan")
 
     def hash_password(self, password):
         """Hash the password before storing it."""
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        self._password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
         """Verify the hashed password."""
-        return bcrypt.check_password_hash(self.password, password)
+        return bcrypt.check_password_hash(self._password, password)
 
-    def __init__(self, first_name, last_name, email, password=None, is_admin=False):
+    def __init__(self, first_name, last_name, email, is_admin=False):
         super().__init__()
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.is_admin = is_admin
-        self.hash_password(password)
-        self.places = [] # User owned places
-        self.reviews = [] # User owned reviews
 
     """
     FIRST NAME
@@ -102,6 +100,20 @@ class User(BaseModel):
     def is_admin(self, value):
         """Admin Setter and return a boolean"""
         self._is_admin = bool(value)
+
+    """
+    PASSWORD
+    """
+    @property
+    def password(self):
+        """Password is write-only"""
+        raise AttributeError("Password is write-only")
+
+    @password.setter
+    def password(self, value):
+        """Password Setter - stores the hashed password directly"""
+        if value:
+            self._password = value
 
     """
     SAVE

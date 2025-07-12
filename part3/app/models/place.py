@@ -1,43 +1,37 @@
 import uuid
 from datetime import datetime
-from app.models.users import User
-from baseclass import BaseModel
-from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey, Table
+from app.models.baseclass import BaseModel
+from sqlalchemy import Column, String, Float, Text, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from app import db
-from flask_bcrypt import Bcrypt
 
-bcrypt = Bcrypt()
-
-place_amenity = Table('place_amenity', Base.metadata,
+place_amenity = Table('place_amenity', db.metadata,
     Column('place_id', String(60), ForeignKey('places.id'), primary_key=True),
     Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True)
 )
 
 class Place(BaseModel):
     __tablename__ = 'places'
-    _title = db.Column(db.String(100), nullable=False, unique=True)
-    _description = db.Column(db.Text(), nullable=False)
-    _price = db.Column(db.Float(), nullable=False)
-    _latitude = db.Column(db.Float(), nullable=False)
-    _longitude = db.Column(db.Float(), nullable=False)
-    _owner_id = Column("owner_id", String(60), ForeignKey('users.id'), nullable=False)
+    _title = db.Column('title', db.String(100), nullable=False)
+    _description = db.Column('description', db.Text(), nullable=False)
+    _price = db.Column('price', db.Float(), nullable=False)
+    _latitude = db.Column('latitude', db.Float(), nullable=False)
+    _longitude = db.Column('longitude', db.Float(), nullable=False)
+    _owner_id = db.Column('owner_id', db.String(60), db.ForeignKey('users.id'), nullable=False)
+
+    # Relationships
     owner_r = relationship("User", back_populates="places_r")
     reviews_r = relationship("Review", back_populates="place_r")
+    amenities_r = relationship("Amenity", secondary=place_amenity, back_populates="places_r")
 
-
-    def __init__(self, title, description, price, latitude, longitude, owner_id, amenities=None):
-        self.id = str(uuid.uuid4())
+    def __init__(self, title, description, price, latitude, longitude, owner_id):
+        super().__init__()
         self.title = title
         self.description = description
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
         self.owner_id = owner_id
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
-        self.reviews = []
-        self.amenities = amenities or []
 
     """
     TITLE
@@ -123,7 +117,7 @@ class Place(BaseModel):
     @owner_id.setter
     def owner_id(self, value):
         if not value:
-            raise ValueError("Owner ID cannot be found")
+            raise ValueError("Owner ID cannot be empty")
         self._owner_id = str(value)
 
     """
@@ -147,11 +141,14 @@ class Place(BaseModel):
     ADD REVIEW
     """
     def add_review(self, review):
-        self.reviews.append(review)
+        """Add a review to this place"""
+        if review not in self.reviews_r:
+            self.reviews_r.append(review)
 
     """
     ADD AMENITY
     """
     def add_amenity(self, amenity):
-        if amenity not in self.amenities:
-            self.amenities.append(amenity)
+        """Add an amenity to this place"""
+        if amenity not in self.amenities_r:
+            self.amenities_r.append(amenity)
