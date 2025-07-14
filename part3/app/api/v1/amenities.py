@@ -4,6 +4,10 @@ from app.services import facade
 
 api = Namespace('amenities', description='Amenity operations')
 
+link_model = api.model('AmenityLink', {
+    'amenity_id': fields.String(required=True, description="ID of the amenity to add")
+})
+
 # Define the amenity model for input validation and documentation
 amenity_model = api.model('Amenity', {
     'name': fields.String(required=True, description='Name of the amenity')
@@ -60,3 +64,13 @@ class AmenityResource(Resource):
             return {"Success": "Amenity updated successfully"}, 200
         except Exception as e:
             return {"Error": str(e)}, 400
+    
+    @api.response(200, 'Amenity deleted successfully')
+    @api.response(404, 'Amenity not found')
+    def delete(self, amenity_id):
+        """Delete an amenity by ID"""
+        success = facade.amenity_repo.delete(amenity_id)
+        if success:
+            return {"Success": "Amenity deleted successfully"}, 200
+        return {"Error": "Amenity not found"}, 404
+    

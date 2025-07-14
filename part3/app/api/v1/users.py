@@ -19,12 +19,28 @@ user_update_model = api.model('UserUpdate', {
 
 @api.route('/')
 class UserList(Resource):
+
+    @api.response(200, 'List of users')
+    def get(self):
+        """Get all users"""
+        users = facade.user_repo.get_all()
+        return [{
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email
+        } for user in users], 200
+    
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new user"""
+        
+        print(">>> POST /users route triggered")  # Add this line first
+    
+
         user_data = api.payload
 
         # Check if email already exists
@@ -47,6 +63,7 @@ class UserList(Resource):
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
+            print("CREATE USER ERROR:", e)
             # Catch database integrity errors and other exceptions
             error_msg = str(e)
             if 'UNIQUE constraint failed' in error_msg or 'already registered' in error_msg:
@@ -55,6 +72,7 @@ class UserList(Resource):
 
 @api.route('/<user_id>')
 class UserResource(Resource):
+
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
@@ -76,7 +94,6 @@ class UserResource(Resource):
     def put(self, user_id):
         """Update a user's information"""
         user_data = api.payload
-
         try:
             updated_user = facade.update_user(user_id, user_data)
             if not updated_user:
@@ -92,7 +109,8 @@ class UserResource(Resource):
             }, 200
         except ValueError as e:
             return {'error': str(e)}, 400
-        except Exception:
+        except Exception as e:
+            print("UPDATE USER ERROR:", e)  # This helps you debug in the terminal
             return {'error': 'An error occurred while updating the user'}, 500
 
     @api.response(200, 'User deleted successfully')

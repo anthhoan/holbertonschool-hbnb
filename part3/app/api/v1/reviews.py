@@ -80,27 +80,49 @@ class ReviewResource(Resource):
     @api.expect(review_model)
     @api.response(200, "Review updated successfully")
     @api.response(404, "Review not found")
+    @api.response(403, "Unauthorized to update this review")
     @api.response(400, "Invalid input data")
     def put(self, review_id):
-        """Update a review's information"""
+        """Update a review's information (only by its author)"""
         data = request.json
+        user_id = data.get("user_id")
+
+        review = facade.get_review(review_id)
+        if not review:
+            return {"error": "Review not found"}, 404
+
+        if review.user_id != user_id:
+            return {"error": "You are not authorized to update this review"}, 403
+
         try:
-            review = facade.update_review(review_id, data)
-            if review is None:
-                return {"error": "Review not found"}, 404
+            updated_review = facade.update_review(review_id, data)
             return {"message": "Review updated successfully"}, 200
         except ValueError as e:
             return {"error": str(e)}, 400
         except Exception:
             return {"error": "An error occurred while updating the review"}, 500
 
+
+    @api.expect(api.model("DeletePayload", {"user_id": fields.String(required=True)}))
     @api.response(200, "Review deleted successfully")
+    @api.response(403, "Unauthorized to delete this review")
     @api.response(404, "Review not found")
     def delete(self, review_id):
-        """Delete a review"""
+        """Delete a review (only by its author)"""
+        data = request.json
+        user_id = data.get("user_id")
+
+        review = facade.get_review(review_id)
+        if not review:
+            return {"Error": "Review not found"}, 404
+
+        if review.user_id != user_id:
+            return {"Error": "You are not authorized to delete this review"}, 403
+
         success = facade.delete_review(review_id)
         if not success:
-            return {"Error": "Review not found"}, 404
+            return {"Error": "Review deletion failed"}, 500
+
         return {"Success": "Review deleted successfully"}, 200
 
 

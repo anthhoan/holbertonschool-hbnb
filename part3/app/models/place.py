@@ -10,6 +10,19 @@ place_amenity = Table('place_amenity', db.metadata,
     Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True)
 )
 
+def to_dict(self):
+    return {
+        "id": self.id,
+        "title": self.title,
+        "description": self.description,
+        "price": self.price,
+        "latitude": self.latitude,
+        "longitude": self.longitude,
+        "owner_id": self.owner_id,
+        "amenities": [amenity.to_dict() for amenity in self.amenities_r],
+        "reviews": [review.to_dict() for review in self.reviews_r]
+    }
+
 class Place(BaseModel):
     __tablename__ = 'places'
     _title = db.Column('title', db.String(100), nullable=False)
@@ -152,3 +165,16 @@ class Place(BaseModel):
         """Add an amenity to this place"""
         if amenity not in self.amenities_r:
             self.amenities_r.append(amenity)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "price": self.price,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "owner_id": self.owner_id,
+            "amenities": [amenity.to_dict() for amenity in self.amenities_r],
+            "reviews": [review.to_dict() for review in self.reviews_r]  # optional
+        }

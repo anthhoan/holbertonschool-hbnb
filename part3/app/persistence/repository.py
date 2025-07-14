@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from app import db
+from sqlalchemy.orm import joinedload
+from app.models.place import Place
 
 
 class Repository(ABC):
@@ -40,17 +42,26 @@ class SQLAlchemyRepository(Repository):
         db.session.commit()
 
     def get(self, obj_id):
-        return self.model.query.get(obj_id)
+        return db.session.get(self.model, obj_id)
+
 
     def get_all(self):
-        return self.model.query.all()
+        query = db.session.query(self.model)
+        if self.model.__name__ == "Place":
+            query = query.options(
+                joinedload(self.model.reviews_r),
+                joinedload(self.model.amenities_r)
+            )
+        return query.all()
 
-    def update(self, obj_id, data):
+    def update(self, obj_id, update_data):
         obj = self.get(obj_id)
-        if obj:
-            for key, value in data.items():
-                setattr(obj, key, value)
-            db.session.commit()
+        if not obj:
+            return None
+        obj.update(update_data)
+        db.session.commit()
+        return obj 
+
 
     def delete(self, obj_id):
         obj = self.get(obj_id)

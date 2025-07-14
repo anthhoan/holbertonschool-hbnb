@@ -1,8 +1,14 @@
 from app.services import facade
 from flask_restx import Namespace, Resource, fields
+from flask import request
+
 
 
 api = Namespace("places", description="Place operations")
+
+link_model = api.model('AmenityLink', {
+    'amenity_id': fields.String(required=True, description="ID of the amenity to add")
+})
 
 # Define the models for related entities
 amenity_model = api.model(
@@ -45,9 +51,21 @@ place_input_model = api.model('Place', {
     'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
 })
 
-place_output_model = api.inherit('PlaceOutput', place_input_model, {
-    'id': fields.String(description='ID of the place')
+place_output_model = api.model('PlaceOutput', {
+    'id': fields.String(description='ID of the place'),
+    'title': fields.String(description='Title of the place'),
+    'description': fields.String(description='Description of the place'),
+    'price': fields.Float(description='Price per night'),
+    'latitude': fields.Float(description='Latitude'),
+    'longitude': fields.Float(description='Longitude'),
+    'owner_id': fields.String(description='Owner ID'),
+    'amenities': fields.List(fields.Nested(amenity_model)),
+    'reviews': fields.List(fields.Nested(review_model))
 })
+
+
+
+
 
 @api.route('/')
 class PlaceList(Resource):
@@ -95,22 +113,27 @@ class PlaceList(Resource):
     @api.marshal_list_with(place_output_model)
     @api.response(200, 'List of places retrieved successfully')
 
+    
     def get(self):
-        """Retrieve a list of all places"""
-        # Placeholder for logic to return a list of all places
-        return facade.place_repo.get_all()
+        """Retrieve a list of all places with amenities and reviews"""
+        places = facade.place_repo.get_all()
+        return [place.to_dict() for place in places]
+
 
 
 @api.route("/<place_id>")
 class PlaceResource(Resource):
+
     @api.response(200, "Place details retrieved successfully")
     @api.response(404, "Place not found")
     def get(self, place_id):
         """Get place details by ID"""
-        place = facade.get_place(place_id)
+        place = facade.get_place(place_id.strip())
+
         if not place:
             return {"Error": "Place not found"}, 404
-        return place, 200
+
+        return place.to_dict() if hasattr(place, "to_dict") else str(place), 200
 
     @api.expect(place_input_model)
     @api.response(200, 'Place updated successfully')
@@ -120,11 +143,38 @@ class PlaceResource(Resource):
         """Update a place's information"""
         data = api.payload
 
-        # Check if the place exists
-        place = facade.get_place(place_id)
-        if not place:
+        updated_place = facade.update_place(place_id.strip(), data)
+
+        if not updated_place:
             return {'Error': 'Place not found'}, 404
 
-        # Update using facade
-        updated_place = facade.update_place(place_id, data)
-        return {'Success': 'Place updated successfully', 'Updated': updated_place.__dict__}, 200
+        return {
+            'Success': 'Place updated successfully',
+            'Updated': updated_place.to_dict() if hasattr(updated_place, 'to_dict') else str(updated_place)
+        }, 200
+    
+    @api.response(200, "Place deleted successfully")
+    @api.response(404, "Place not found")
+    def delete(self, place_id):
+        """Delete a place by ID"""
+        success = facade.delete_place(place_id.strip())
+
+        if not success:
+            return {"Error": "Place not found"}, 404
+
+        return {"Success": "Place deleted successfully"}, 200
+    
+@api.route('/<place_id>/add_amenity')
+class AddAmenityToPlace(Resource):
+    @api.expect(link_model)
+    @api.response(200, 'Amenity successfully added to place')
+    @api.response(404, 'Place or amenity not found')
+    def post(self, place_id):
+        """Add an amenity to a place"""
+        data = request.get_json()
+        amenity_id = data.get("amenity_id")
+        try:
+            place = facade.add_amenity_to_place(place_id, amenity_id)
+            return place.to_dict(), 200
+        except ValueError as e:
+            return {"error": str(e)}, 404
