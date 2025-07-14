@@ -51,3 +51,9 @@ class Amenity(BaseModel):
             if hasattr(self, key):
                 setattr(self, key, value)
         self.save()
+
+    def to_dict(self):
+        return {
+        "id": self.id,
+        "name": self.name
+    }

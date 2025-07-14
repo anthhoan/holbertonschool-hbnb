@@ -4,6 +4,8 @@ from app.models.review import Review
 from app.models.users import User
 from app.persistence.UserRepository import UserRepository
 from app.persistence.repository import SQLAlchemyRepository
+from app import bcrypt
+from app import db
 
 
 class HBnBFacade:
@@ -20,8 +22,7 @@ class HBnBFacade:
         # Extract password and create user without it
         password = user_data.pop('password')
         user = User(**user_data)
-        # Hash the password after creating the user
-        user.hash_password(password)
+        user.password = bcrypt.generate_password_hash(password).decode('utf-8')
         self.user_repo.add(user)
         return user
 
@@ -40,6 +41,7 @@ class HBnBFacade:
         allowed_fields = ["first_name", "last_name"]
         update_data = {k: v for k, v in user_data.items() if k in allowed_fields}
         user.update(update_data)
+        db.session.commit()
         return user
 
     def delete_user(self, user_id):
@@ -66,6 +68,18 @@ class HBnBFacade:
 
     def update_amenity(self, amenity_id, amenity_data):
         return self.amenity_repo.update(amenity_id, amenity_data)
+    
+    def add_amenity_to_place(self, place_id, amenity_id):
+        place = self.place_repo.get(place_id)
+        amenity = self.amenity_repo.get(amenity_id)
+        if not place:
+            raise ValueError("Place not found")
+        if not amenity:
+            raise ValueError("Amenity not found")
+        place.add_amenity(amenity)
+        db.session.commit()
+        return place
+
 
 
     """
@@ -84,6 +98,14 @@ class HBnBFacade:
 
     def update_place(self, place_id, place_data):
         return self.place_repo.update(place_id, place_data)
+    
+    def delete_place(self, place_id):
+        place = self.place_repo.get(place_id)
+        if not place:
+            return False
+        self.place_repo.delete(place_id)
+        return True
+
 
 
     """
@@ -126,11 +148,21 @@ class HBnBFacade:
         review = self.review_repo.get(review_id)
         if not review:
             return None
+
+        # Check if user_id is present and matches the review's user_id
+        if "user_id" not in review_data:
+            raise ValueError("Missing user_id for authorization")
+        
+        if review.user_id != review_data["user_id"]:
+            raise ValueError("You are not authorized to update this review")
+
         # Only allow updating text and rating
         allowed_fields = ["text", "rating"]
         update_data = {k: v for k, v in review_data.items() if k in allowed_fields}
         review.update(update_data)
+        db.session.commit()
         return review
+
 
     def delete_review(self, review_id):
         # SQLAlchemy will handle relationship cleanup automatically

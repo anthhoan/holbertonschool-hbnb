@@ -126,8 +126,10 @@ class User(BaseModel):
     UPDATE
     """
     def update(self, data):
-        """Function to save updated_at time"""
+        """Update user fields and commit to the database"""
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
-        self.save()
+        self.updated_at = datetime.now()
+        
+
